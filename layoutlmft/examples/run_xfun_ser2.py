@@ -88,10 +88,12 @@ def main():
     def converting(df_dict):
         import json
         columns = ['input_ids', 'bbox', 'labels', 'image']
-        res = {}
         for c in columns:
-            res[c] = df_dict[c].values.tolist()
-        return res
+            tmp = []
+            for i in range(len(df_dict[c])):
+                tmp.append(json.loads(df_dict[c][i]))
+            df_dict[c] = tmp
+        return df_dict
 
     datasets = Dataset.from_dict(converting(
         pd.read_csv('/home/ubuntu/smbc_kv/training_dataset_211112.csv')))
@@ -106,12 +108,12 @@ def main():
     #     keep_in_memory=True,
     # )
 
-    # if training_args.do_train:
-    #     column_names = datasets["train"].column_names
-    #     features = datasets["train"].features
-    # else:
-    column_names = datasets["validation"].column_names
-    features = datasets["validation"].features
+    if training_args.do_train:
+        column_names = datasets["train"].column_names
+        features = datasets["train"].features
+    else:
+        column_names = datasets["validation"].column_names
+        features = datasets["validation"].features
     text_column_name = "input_ids"
     label_column_name = "labels"
 
